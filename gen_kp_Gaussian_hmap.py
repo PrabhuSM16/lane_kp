@@ -1,6 +1,7 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 def gauss_radius(det_size, min_overlap=0.7):
   # det_size contains bbox height and width
@@ -36,13 +37,13 @@ def draw_hmap(ctr_map, map_size=(120,160), kp_thresh=0, gauss_iou=0.7, k=1):
   h, w = map_size
   hmap = np.zeros((h, w), dtype=np.float32)
   radius = max(0, int(gauss_radius((math.ceil(h), math.ceil(w)), gauss_iou)))
-  #diameter = 2*radius+1
-  gaussian = gaussian2D((radius, radius), sigma=diameter/6)
+  # diameter = 2*radius+1
+  gaussian = gaussian2D((radius, radius), sigma=(2*radius+1)/6)
   y, x = np.where(ctr_map>kp_thresh)
   if ctr_map.shape != map_size:
     x. y = [(int(i*map_size[0]/w), int(j*map_size[1]/h)) for i, j in zip(x, y)]
-  left, right = min(x, radius), min(width-x, radius+1)
-  top, bottom = min(y, radius), min(height-y, radius+1)
+  left, right = min(x, radius), min(w-x, radius+1)
+  top, bottom = min(y, radius), min(h-y, radius+1)
   masked_hmap = hmap[y-top:y+bottom, x-left:x+right]
   masked_gauss = gaussian[radius-top:radius+bottom, radius-left:radius+right]
   if min(masked_gauss.shape)>0 and min(masked_hmap.shape)>0:
